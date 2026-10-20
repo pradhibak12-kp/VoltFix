@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltFix - Local Utility & Cable Redressal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+        }
+        .phone-frame {
+            max-width: 420px;
+            height: 850px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* Custom scrollbar for clean mobile feel */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-2 sm:p-6">
+
+    <!-- Phone Wrapper -->
+    <div class="phone-frame w-full bg-slate-50 rounded-[40px] overflow-hidden flex flex-col relative border-[8px] border-slate-800">
+        
+        <!-- Top Status Bar Mock -->
+        <div class="bg-indigo-900 text-white px-6 pt-3 pb-2 flex justify-between items-center text-xs font-semibold z-20">
+            <span>10:42 AM</span>
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-signal text-[10px]"></i>
+                <i class="fa-solid fa-wifi text-[10px]"></i>
+                <i class="fa-solid fa-battery-full text-emerald-400"></i>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <header class="bg-indigo-900 text-white px-6 pb-4 pt-2 flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-700 border-2 border-indigo-400 flex items-center justify-center font-bold text-lg shadow">
+                    PK
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-wide">VoltFix</h1>
+                    <p class="text-[11px] text-indigo-200">Welcome, Pradhiba K.</p>
+                </div>
+            </div>
+            <button onclick="switchTab('profile')" class="text-indigo-200 hover:text-white p-2 rounded-full transition">
+                <i class="fa-solid fa-gear text-lg"></i>
+            </button>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto pb-24 p-4 space-y-4">
+            
+            <!-- HOME TAB -->
+            <div id="tab-home" class="space-y-4">
+                <!-- Weather Alert Banner -->
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-3.5 rounded-xl shadow-xs flex items-start space-x-3">
+                    <div class="bg-amber-100 text-amber-700 p-2 rounded-lg mt-0.5">
+                        <i class="fa-solid fa-cloud-bolt text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-amber-900">Monsoon Weather Alert</h3>
+                        <p class="text-[11px] text-amber-800 mt-0.5">High winds & rains reported in your area. Cable snapping risks are high. Report outages instantly.</p>
+                    </div>
+                </div>
+
+                <!-- Locality Search Bar -->
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </span>
+                    <input type="text" id="searchInput" onkeyup="filterIssues()" placeholder="Search issues by street or locality..." 
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs">
+                </div>
+
+                <!-- Quick Actions / Categories -->
+                <div class="flex space-x-2 overflow-x-auto pb-1 text-xs">
+                    <button onclick="filterCategory('All')" class="category-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap shadow-xs transition">All Issues</button>
+                    <button onclick="filterCategory('Cable Cut')" class="category-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap hover:bg-slate-100 transition">Cable / TV Cut</button>
+                    <button onclick="filterCategory('Power')" class="category-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap hover:bg-slate-100 transition">Power Outage</button>
+                    <button onclick="filterCategory('Internet')" class="category-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap hover:bg-slate-100 transition">Internet Line</button>
+                </div>
+
+                <!-- Issues Feed Header -->
+                <div class="flex justify-between items-center pt-1">
+                    <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Locality Fault Reports</h2>
+                    <span id="issueCount" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-semibold">3 Active</span>
+                </div>
+
+                <!-- Fault Cards Container -->
+                <div id="issuesList" class="space-y-3">
+                    <!-- Dynamic cards inserted via JS -->
+                </div>
+            </div>
+
+            <!-- REPORT TAB -->
+            <div id="tab-report" class="space-y-4 hidden">
+                <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 space-y-3">
+                    <div class="border-b border-slate-100 pb-2">
+                        <h2 class="text-sm font-bold text-slate-800">Report Utility Fault</h2>
+                        <p class="text-[11px] text-slate-500">Submit a cable cut, power drop, or weather damage ticket.</p>
+                    </div>
+
+                    <form id="reportForm" onsubmit="submitReport(event)" class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Reporter Name</label>
+                            <input type="text" id="repName" value="Pradhiba K." required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Locality / Street Name</label>
+                            <input type="text" id="repLocality" placeholder="e.g. Main Street, West Block" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Issue Category</label>
+                            <select id="repCategory" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="Cable Cut">Cable / TV Wire Cut (Weather)</option>
+                                <option value="Power">Power Outage / Line Trip</option>
+                                <option value="Internet">Internet / Fiber Cut</option>
+                                <option value="Sparking">Pole Sparking / Hazard</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Description</label>
+                            <textarea id="repDesc" rows="3" placeholder="Describe the damage or weather impact..." required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Submit Fault Ticket</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- PROFILE TAB -->
+            <div id="tab-profile" class="space-y-4 hidden">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 text-center space-y-3">
+                    <div class="w-16 h-16 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xl font-bold mx-auto border-2 border-indigo-500 shadow-inner">
+                        PK
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800">Pradhiba K.</h2>
+                        <p class="text-[11px] text-slate-500">Verified Citizen Account</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 text-left space-y-2 text-xs">
+                        <div class="flex justify-between py-1 border-b border-slate-50">
+                            <span class="text-slate-500">Registered Phone</span>
+                            <span class="font-semibold text-slate-700">+91 98765 43210</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-50">
+                            <span class="text-slate-500">Default Zone</span>
+                            <span class="font-semibold text-slate-700">Zone 3 - North Sector</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-slate-500">Total Tickets Filed</span>
+                            <span class="font-semibold text-indigo-600" id="userTicketCount">2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- VoltDog AI Mascot & Floating Help Box -->
+        <div class="absolute bottom-16 right-4 z-30 flex flex-col items-end">
+            <!-- Speech Bubble Box -->
+            <div id="aiHelpBox" class="hidden bg-white text-slate-800 text-[11px] p-3 rounded-2xl shadow-xl border border-indigo-100 mb-2 max-w-[220px] relative animate-fade-in">
+                <button onclick="toggleAiBox()" class="absolute top-1.5 right-2 text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+                <p class="font-bold text-indigo-900 mb-0.5"><i class="fa-solid fa-dog text-indigo-600 mr-1"></i> VoltDog AI</p>
+                <p id="aiMessage" class="text-slate-600 leading-relaxed">"Woof! Heavy winds can snap outdoor lines. Need help checking your ticket status or logging a weather fault?"</p>
+            </div>
+            <!-- Floating Mascot Button -->
+            <button onclick="toggleAiBox()" class="w-12 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center text-xl transition transform hover:scale-105 border-2 border-white">
+                <i class="fa-solid fa-dog"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-around items-center z-20 shadow-lg">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-indigo-600 transition">
+                <i class="fa-solid fa-house text-base"></i>
+                <span class="text-[10px] font-bold mt-1">Home</span>
+            </button>
+            <button onclick="switchTab('report')" id="nav-report" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-circle-plus text-base"></i>
+                <span class="text-[10px] font-medium mt-1">Report</span>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-user text-base"></i>
+                <span class="text-[10px] font-medium mt-1">Profile</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Mock Database
+        let issues = [
+            {
+                id: 1,
+                name: "Pradhiba K.",
+                locality: "Main Street, Sector 2",
+                category: "Cable Cut",
+                desc: "Outdoor TV cable snapped due to heavy overnight wind and rain.",
+                status: "In Progress",
+                time: "10 mins ago"
+            },
+            {
+                id: 2,
+                name: "Ramesh Kumar",
+                locality: "Gandhi Nagar 3rd Cross",
+                category: "Power",
+                desc: "Low voltage and intermittent power flickering following storm.",
+                status: "Pending",
+                time: "45 mins ago"
+            },
+            {
+                id: 3,
+                name: "Anitha S.",
+                locality: "Market Road",
+                category: "Internet",
+                desc: "Fiber optic line down across the electric pole.",
+                status: "Resolved",
+                time: "2 hours ago"
+            }
+        ];
+
+        let currentCategory = 'All';
+
+        // Render issues on startup
+        window.onload = function() {
+            renderIssues();
+        };
+
+        function renderIssues(filteredList = issues) {
+            const listContainer = document.getElementById('issuesList');
+            document.getElementById('issueCount').innerText = `${filteredList.length} Active`;
+            
+            if (filteredList.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-box-open text-3xl mb-2"></i>
+                        <p class="text-xs">No utility faults found matching your search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = filteredList.map(issue => {
+                let badgeColor = 'bg-amber-100 text-amber-700';
+                if (issue.status === 'Resolved') badgeColor = 'bg-emerald-100 text-emerald-700';
+                if (issue.status === 'In Progress') badgeColor = 'bg-blue-100 text-blue-700';
+
+                return `
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${issue.category}</span>
+                                <h3 class="text-xs font-bold text-slate-800 mt-1"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>${issue.locality}</h3>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${badgeColor}">${issue.status}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 leading-normal">${issue.desc}</p>
+                        <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1 border-t border-slate-50">
+                            <span>Reported by: <strong>${issue.name}</strong></span>
+                            <span>${issue.time}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabName) {
+            ['home', 'report', 'profile'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center text-slate-400 hover:text-slate-600 transition";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center text-indigo-600 transition";
+        }
+
+        // Category Filter
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // Update active pill button styling
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.innerText.includes(category) || (category === 'All' && btn.innerText.includes('All'))) {
+                    btn.className = "category-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap shadow-xs transition";
+                } else {
+                    btn.className = "category-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-medium whitespace-nowrap hover:bg-slate-100 transition";
+                }
+            });
+
+            applyFilters();
+        }
+
+        // Locality Search Filter
+        function filterIssues() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let result = issues;
+
+            if (currentCategory !== 'All') {
+                result = result.filter(i => i.category.toLowerCase().includes(currentCategory.toLowerCase()) || currentCategory.toLowerCase().includes(i.category.toLowerCase()));
+            }
+
+            if (query) {
+                result = result.filter(i => i.locality.toLowerCase().includes(query) || i.desc.toLowerCase().includes(query));
+            }
+
+            renderIssues(result);
+        }
+
+        // Handle Report Submission
+        function submitReport(e) {
+            e.preventDefault();
+            const name = document.getElementById('repName').value;
+            const locality = document.getElementById('repLocality').value;
+            const category = document.getElementById('repCategory').value;
+            const desc = document.getElementById('repDesc').value;
+
+            const newIssue = {
+                id: issues.length + 1,
+                name: name,
+                locality: locality,
+                category: category,
+                desc: desc,
+                status: "Pending",
+                time: "Just now"
+            };
+
+            issues.unshift(newIssue);
+            document.getElementById('reportForm').reset();
+            document.getElementById('repName').value = "Pradhiba K."; // Keep default name
+
+            // Switch back to home and refresh
+            switchTab('home');
+            renderIssues();
+        }
+
+        // Toggle VoltDog AI Chat Help Box
+        function toggleAiBox() {
+            const box = document.getElementById('aiHelpBox');
+            box.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
